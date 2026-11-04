@@ -35,10 +35,8 @@ public class MenuPrincipal {
             System.out.println("4. Consultar productos");
             System.out.println("5. Exportar productos");
             System.out.println("6. Guardar y recuperar inventario");
-            System.out.println("7. Consulta XML mediante XPath");
-            System.out.println("8. Gestion de Stock Binario");
             System.out.println("0. Salir");
-            opcion = LectorConsola.leerOpcion("Selecciona una opción: ", 0, 8);
+            opcion = LectorConsola.leerOpcion("Selecciona una opción: ", 0, 6);
             switch (opcion) {
                 case 1 -> {
                     // pedimos la ruta
@@ -60,11 +58,6 @@ public class MenuPrincipal {
                     menuExportaciones();
                 case 6 ->
                     menuSerializacion();
-                case 7 -> {
-                    String ruta = LectorConsola.leerTexto("Introduce la ruta");
-                    inventario.consultaXPath(ruta);
-                }
-                case 8 -> menuGestionBinario();
                 case 0 ->
                     System.out.println(ColoresConsola.pintar("Hasta pronto.", ColoresConsola.VERDE));
                 default ->
@@ -158,35 +151,6 @@ public class MenuPrincipal {
                     throw new IllegalStateException("Opción inesperada");
             }
         } while (opcion != 0);
-    }
-
-    private void menuGestionBinario() {
-        int subOpcion;
-        do {
-            System.out.println("\n---- GESTIÓN DE STOCK BINARIO (RF-FIC-08) ----");
-            System.out.println("1. Generar / Sobrescribir stock.bin desde memoria");
-            System.out.println("2. Consultar / Modificar stock por posición aleatoria (seek)");
-            System.out.println("0. Volver al menú principal");
-            subOpcion = LectorConsola.leerOpcion("Elige opción: ", 0, 2);
-
-            switch (subOpcion) {
-                case 1 -> {
-                    inventario.generarStockBinario("datos/salidas/stock.bin");
-
-                }
-
-                case 2 -> {
-                    inventario.gestionarAccesoAleatorioStock("datos/salidas/stock.bin");
-                }
-                case 0 -> {
-                }
-
-                default ->
-                    throw new IllegalStateException("Opción inesperada");
-
-            }
-
-        } while (subOpcion != 0);
     }
 
     /**
