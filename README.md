@@ -18,6 +18,14 @@ DataStock es una práctica **individual e integradora** que evolucionará durant
 - JDK **21** instalado y seleccionado en el IDE (`java -version`).
 - Maven instalado, o un IDE con integración Maven.
 - Consola con UTF-8 para ver correctamente tildes y símbolos.
+- MySQL Server: 8.0.44 Community Server (Win64).
+- SQLite: Motor embedido local.
+- IMPORTANTE -> Poner la dependencia de slf4j para evitar avisos por consola a la hora d ejecutar la app
+
+### Drivers y Dependencias (Maven)
+* **MySQL Connector/J:** `8.0.33` (`com.mysql:mysql-connector-j`)
+* **SQLite JDBC:** `3.45.1.0` (`org.xerial:sqlite-jdbc`)
+* **slf4j-simple** `1.7.36`
 
 ## 3. Cómo abrir y ejecutar
 
@@ -42,48 +50,24 @@ mvn exec:java -Dexec.mainClass=es.iesisidra.datastock.complementarias.AccesoAlea
 ## 4. Organización inicial del proyecto
 
 ```text
-DataStock/
-├── .git/
+DataStock_V2/
 ├── datos/
-│   ├── ejemplos/                         # Archivos de prueba para importación
-│   │   ├── catalogo_con_errores.json
-│   │   ├── catalogo_malformado.json
-│   │   ├── catalogo_valido.json
-│   │   ├── catalogo_valido.xml
-│   │   └── LEEME.txt
-│   └── salidas/                          # Exportaciones y ficheros binarios generados
-│       ├── .gitkeep
-│       └── stock.bin                     # Acceso aleatorio (36 bytes/registro)
-├── material_referencia/                  # Recursos para UT2 (SQL y ER)
-│   ├── DataStock_BD_MySQL.sql
-│   └── DataStock_Diagrama_ER_CrowFoot...
-├── src/
-│   ├── main/java/es/iesisidra/datastock/
-│   │   ├── complementarias/
-│   │   │   ├── AccesoAleatorioActividad.java
-│   │   │   └── XPathActividad.java
-│   │   ├── config/
-│   │   │   └── XmlConfig.java              # Configuracion para la posterior lectura/guardado de XML
-│   │   ├── modelo/
-│   │   │   ├── Categoria.java
-│   │   │   ├── MovimientoStock.java
-│   │   │   ├── Producto.java
-│   │   │   └── Proveedor.java
-│   │   ├── repository/
-│   │   │   └── ProductoXmlRepository.java  # Lectura y guardado seguro en XML
-│   │   ├── servicio/
-│   │   │   └── Inventario.java           # Lógica principal y persistencia
-│   │   ├── ui/
-│   │   │   └── MenuPrincipal.java        # Navegación y flujo de consola
-│   │   ├── util/
-│   │   │   ├── ColoresConsola.java
-│   │   │   └── LectorConsola.java
-│   │   └── App.java                      # Punto de entrada
-│   └── test/
-├── target/
-├── .gitignore
-├── pom.xml
-└── README.md
+│   ├── ejemplos/              # Archivos de prueba (JSON/XML)
+│   └── salidas/               # Exportaciones y ficheros generados
+├── material_referencia/       # Scripts SQL y esquemas ER
+└── src/
+    └── main/
+        ├── java/es/iesisidra/datastock/
+        │   ├── complementarias/   # Prácticas de acceso aleatorio y XPath
+        │   ├── config/            # Configuración de conexiones (ConexionBD.java)
+        │   ├── modelo/            # Clases del modelo (Categoria, Producto, Proveedor, etc.)
+        │   ├── repository/        # Repositorios y persistencia en XML
+        │   ├── servicio/          # Lógica de negocio, inventario y GestorBaseDatos.java
+        │   ├── ui/                # Interfaz de consola (MenuPrincipal.java)
+        │   ├── util/              # Utilidades (Colores ANSI, LectorConsola)
+        │   └── App.java           # Punto de entrada principal
+        └── resources/
+            └── db.properties      # Credenciales de conexión (Excluido de Git)
 ```
 
 ## 5. Opciones que han de aparecer
@@ -128,3 +112,5 @@ DataStock/
 - Importar JSON/XML **añade** productos; recuperar un `.dat` **sustituye** el inventario, tras confirmar cuando corresponda.
 - En UT1 no hay base de datos: los ID de categoría y proveedor se comprueban como enteros positivos, pero no se buscan en MySQL.
 - El fichero `stock.bin` de RF-FIC-08 es una **copia independiente**: los cambios hechos allí no actualizan la colección Java.
+- Se debe ejecutar en MySQL el script que contiene la BD (incluido en material_referencia)
+- Para ejecutar la aplicación, debes crear un archivo **src/main/resources/db.properties** con las variables **db.url, db.username y db.password.** Este archivo está ignorado en Git por seguridad.

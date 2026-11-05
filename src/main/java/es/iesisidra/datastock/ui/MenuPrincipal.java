@@ -1,5 +1,6 @@
 package es.iesisidra.datastock.ui;
 
+import es.iesisidra.datastock.servicio.GestorBaseDatos;
 import es.iesisidra.datastock.servicio.Inventario;
 import es.iesisidra.datastock.util.ColoresConsola;
 import es.iesisidra.datastock.util.LectorConsola;
@@ -14,6 +15,7 @@ import es.iesisidra.datastock.util.LectorConsola;
 public class MenuPrincipal {
 
     private final Inventario inventario;
+    private final GestorBaseDatos gestorBD = new GestorBaseDatos();
 
     /**
      * @param inventario colección común de productos de esta ejecución.
@@ -35,8 +37,9 @@ public class MenuPrincipal {
             System.out.println("4. Consultar productos");
             System.out.println("5. Exportar productos");
             System.out.println("6. Guardar y recuperar inventario");
+            System.out.println("7. Gestionar base de datos MySQL");
             System.out.println("0. Salir");
-            opcion = LectorConsola.leerOpcion("Selecciona una opción: ", 0, 6);
+            opcion = LectorConsola.leerOpcion("Selecciona una opción: ", 0, 7);
             switch (opcion) {
                 case 1 -> {
                     // pedimos la ruta
@@ -58,8 +61,11 @@ public class MenuPrincipal {
                     menuExportaciones();
                 case 6 ->
                     menuSerializacion();
+                case 7 ->
+                    menuBD();
                 case 0 ->
                     System.out.println(ColoresConsola.pintar("Hasta pronto.", ColoresConsola.VERDE));
+
                 default ->
                     throw new IllegalStateException("Opción inesperada");
             }
@@ -72,6 +78,47 @@ public class MenuPrincipal {
         System.out.println(ColoresConsola.pintar("                 FASE 1 - UT1", ColoresConsola.CIAN));
         System.out.println(ColoresConsola.pintar("================================================", ColoresConsola.CIAN));
         System.out.println(ColoresConsola.pintar("Productos en memoria: " + inventario.getProductos().size(), ColoresConsola.GRIS));
+    }
+
+    private void mostrarCabeceraUT2() {
+        System.out.println(ColoresConsola.pintar("\n================================================", ColoresConsola.CIAN));
+        System.out.println(ColoresConsola.pintar("         GESTIÓN MYSQL - UT2", ColoresConsola.NEGRITA));
+        System.out.println(ColoresConsola.pintar("================================================", ColoresConsola.CIAN));
+    }
+
+    private void menuBD () {
+        int opcion;
+
+        do {
+            mostrarCabeceraUT2();
+            System.out.println("1. Comprobar conexión y mostrar información de la BD");
+            System.out.println("2. Gestionar categorías");
+            System.out.println("3. Gestionar proveedores");
+            System.out.println("4. Gestionar productos (CRUD)");
+            System.out.println("5. Consultar y buscar productos");
+            System.out.println("6. Registrar entrada o salida de stock");
+            System.out.println("7. Consultar historial de movimientos");
+            System.out.println("8. Importar productos de memoria a MySQL");
+            System.out.println("9. Demostración de transacción con commit/rollback");
+            System.out.println("0. Volver al menú principal");
+            System.out.println("=========================================");
+            opcion = LectorConsola.leerOpcion("Selecciona una opción: ", 0, 7);
+
+            switch (opcion) {
+                case 1:
+                    gestorBD.comprobarConexion();
+                    
+                    break;
+            
+                default:
+                    break;
+            }
+
+
+            
+        } while (opcion != 0);
+        
+
     }
 
     private void menuConsultas() {
