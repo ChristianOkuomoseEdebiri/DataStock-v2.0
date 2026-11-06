@@ -20,7 +20,7 @@ DataStock es una práctica **individual e integradora** que evolucionará durant
 - Consola con UTF-8 para ver correctamente tildes y símbolos.
 - MySQL Server: 8.0.44 Community Server (Win64).
 - SQLite: Motor embedido local.
-- IMPORTANTE -> Poner la dependencia de slf4j para evitar avisos por consola a la hora d ejecutar la app
+- IMPORTANTE -> Poner la dependencia de slf4j para evitar avisos por consola a la hora de ejecutar la app
 
 ### Drivers y Dependencias (Maven)
 * **MySQL Connector/J:** `8.0.33` (`com.mysql:mysql-connector-j`)
