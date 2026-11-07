@@ -10,6 +10,7 @@ import es.iesisidra.datastock.config.ConexionBD;
 import es.iesisidra.datastock.util.ColoresConsola;
 
 public class GestorBaseDatos {
+    private GestorCategorias gestorCategorias = new GestorCategorias();
 
     public void comprobarConexion() {
         System.out.println("Comprobando conexión...");
@@ -51,4 +52,23 @@ public class GestorBaseDatos {
             System.out.println(ColoresConsola.ROJO + "Motivo: " + e.getMessage() + ColoresConsola.RESET);
         }
     }
+
+    public void altaCategoria (int id, String nombre) {
+        gestorCategorias.altaCategoria(id, nombre);
+    }
+
+    public void listarCategorias() {
+        gestorCategorias.listarCategorias();
+    }
+
+    public void modificarNombreCategoria (int id) {
+        gestorCategorias.modificarNombre(id);
+    }
+
+    public void eliminarCategoria (int id) {
+        gestorCategorias.eliminarCategoria(id);
+    }
+    
+
+
 }

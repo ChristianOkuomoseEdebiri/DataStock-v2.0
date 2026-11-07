@@ -109,6 +109,9 @@ public class MenuPrincipal {
                     gestorBD.comprobarConexion();
                     
                     break;
+
+                case 2:
+                    menuCategorias();
             
                 default:
                     break;
@@ -197,6 +200,47 @@ public class MenuPrincipal {
                 default ->
                     throw new IllegalStateException("Opción inesperada");
             }
+        } while (opcion != 0);
+    }
+
+
+    private void menuCategorias() {
+        int opcion;
+        do {
+            System.out.println("1. Dar de alta una categoria");
+            System.out.println("2. Listar categorias");
+            System.out.println("3. Modificar el nombre de una categoria");
+            System.out.println("4. Eliminar una categoria");
+            System.out.println("0. Volver al menu MySQL");
+            opcion = LectorConsola.leerOpcion("Selecciona una opcion", 0, 4);
+            
+            switch (opcion) {
+                case 1 -> {
+                    String nombre = LectorConsola.leerTexto("Introduce el nombre");
+                    int id = LectorConsola.leerEntero("Introduce el identificador");
+                    gestorBD.altaCategoria(id, nombre);
+                }
+                case 2 -> {
+                    gestorBD.listarCategorias();
+                    
+                }
+                case 3 -> {
+                    int id = LectorConsola.leerEntero("Introduce el identificador");
+                    gestorBD.modificarNombreCategoria(id);
+
+                }
+                case 4 -> {
+                    int id = LectorConsola.leerEntero("Introduce el identificador");
+                    gestorBD.eliminarCategoria(id);
+                }
+                case 0 -> {
+                }
+                default ->
+                    throw new IllegalStateException("Opción inesperada");
+            }
+            
+        
+            
         } while (opcion != 0);
     }
 
