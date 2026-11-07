@@ -38,8 +38,8 @@ public class GestorCategorias {
         }
 
         // llegados aqui debemos conectarnos con la base de datos y comprobar que no existe el id ni otra categoria con el mismo nombre
-        String consultaID = "SELECT * FROM categoria WHERE ID = ?";
-        String consultaNombre = "SELECT * FROM categoria WHERE NOMBRE = ?";
+        String consultaID = "SELECT * FROM categoria WHERE id = ?";
+        String consultaNombre = "SELECT * FROM categoria WHERE nombre = ?";
         String insertarCategoria = "INSERT INTO categoria (id, nombre) VALUES (?, ?)";
 
         try (Connection con = ConexionBD.obtenerConexion(); PreparedStatement psNombre = con.prepareStatement(consultaNombre); PreparedStatement psID = con.prepareStatement(consultaID); PreparedStatement psInsertar = con.prepareStatement(insertarCategoria)) {
@@ -84,9 +84,8 @@ public class GestorCategorias {
 
     public void listarCategorias() {
         String listar = "SELECT id, nombre FROM categoria ORDER BY id"; // no pongo ASC ya que por defecto es ascendente
-        try (Connection con = ConexionBD.obtenerConexion(); PreparedStatement psListar = con.prepareStatement(listar)) {
+        try (Connection con = ConexionBD.obtenerConexion(); PreparedStatement psListar = con.prepareStatement(listar); ResultSet rs = psListar.executeQuery();) {
 
-            ResultSet rs = psListar.executeQuery();
             boolean vacio = true; // si entra en el bucle es que hay por lo menos una categoria por lo que no estaria vacio
 
             while (rs.next()) {

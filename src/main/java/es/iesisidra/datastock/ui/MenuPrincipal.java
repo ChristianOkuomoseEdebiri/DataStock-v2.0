@@ -105,16 +105,24 @@ public class MenuPrincipal {
             opcion = LectorConsola.leerOpcion("Selecciona una opción: ", 0, 7);
 
             switch (opcion) {
-                case 1:
+                case 1 -> {
                     gestorBD.comprobarConexion();
-                    
-                    break;
-
-                case 2:
-                    menuCategorias();
+                }
             
-                default:
-                    break;
+
+                case 2 -> {
+                    menuCategorias();
+                }
+                    
+                
+                case 3 -> {
+                    menuProveedores();
+                }
+
+                default -> {
+                    throw new IllegalStateException("Opción inesperada");
+                }
+                    
             }
 
 
@@ -232,6 +240,46 @@ public class MenuPrincipal {
                 case 4 -> {
                     int id = LectorConsola.leerEntero("Introduce el identificador");
                     gestorBD.eliminarCategoria(id);
+                }
+                case 0 -> {
+                }
+                default ->
+                    throw new IllegalStateException("Opción inesperada");
+            }
+            
+        
+            
+        } while (opcion != 0);
+    }
+
+    private void menuProveedores() {
+        int opcion;
+        do {
+            System.out.println("1. Dar de alta un proveedor");
+            System.out.println("2. Listar proveedores");
+            System.out.println("3. Modificar el nombre y/o email de un proveedor");
+            System.out.println("4. Eliminar un proveedor");
+            System.out.println("0. Volver al menu MySQL");
+            opcion = LectorConsola.leerOpcion("Selecciona una opcion", 0, 4);
+            
+            switch (opcion) {
+                case 1 -> {
+                    String nombre = LectorConsola.leerTexto("Introduce el nombre");
+                    int id = LectorConsola.leerEntero("Introduce el identificador");
+                    gestorBD.altaProveedor(id, nombre);
+                }
+                case 2 -> {
+                    gestorBD.listarProveedor();
+                    
+                }
+                case 3 -> {
+                    int id = LectorConsola.leerEntero("Introduce el identificador");
+                    gestorBD.modificarNombreProveedor(id);
+
+                }
+                case 4 -> {
+                    int id = LectorConsola.leerEntero("Introduce el identificador");
+                    gestorBD.eliminarProveedor(id);
                 }
                 case 0 -> {
                 }

@@ -114,3 +114,4 @@ DataStock_V2/
 - El fichero `stock.bin` de RF-FIC-08 es una **copia independiente**: los cambios hechos allí no actualizan la colección Java.
 - Se debe ejecutar en MySQL el script que contiene la BD (incluido en material_referencia)
 - Para ejecutar la aplicación, debes crear un archivo **src/main/resources/db.properties** con las variables **db.url, db.username y db.password.** Este archivo está ignorado en Git por seguridad.
+- Si el ID o nombre de alguna de las columnas es invalido no se prosigue con la funcionalidad y no se alteran registros **no se llega a abrir la conexion en ese caso**
