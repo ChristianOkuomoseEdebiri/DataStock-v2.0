@@ -119,6 +119,10 @@ public class MenuPrincipal {
                     menuProveedores();
                 }
 
+                case 4 -> {
+                    menuProducto();
+                }
+
                 default -> {
                     throw new IllegalStateException("Opción inesperada");
                 }
@@ -291,6 +295,45 @@ public class MenuPrincipal {
             
         } while (opcion != 0);
     }
+
+    private void menuProducto() {
+        int opcion;
+        do {
+            System.out.println("1. Dar de alta un producto");
+            System.out.println("2. Consultar producto por codigo");
+            System.out.println("3. Modificar un producto");
+            System.out.println("4. Eliminar un producto");
+            System.out.println("0. Volver al menu MySQL");
+            opcion = LectorConsola.leerOpcion("Selecciona una opcion", 0, 4);
+            
+            switch (opcion) {
+                case 1 -> {
+                    gestorBD.altaProducto();
+                }
+                case 2 -> {
+                    gestorBD.consultaProductoPorCodigo();
+                    
+                }
+                case 3 -> {
+                    gestorBD.modificarProducto();
+                    
+
+                }
+                case 4 -> {
+                    gestorBD.eliminarProducto();
+                }
+                case 0 -> {
+                }
+                default ->
+                    throw new IllegalStateException("Opción inesperada");
+            }
+            
+        
+            
+        } while (opcion != 0);
+    }
+
+
 
     /**
      * Sustituir las llamadas por servicios propios a medida que se implementen
