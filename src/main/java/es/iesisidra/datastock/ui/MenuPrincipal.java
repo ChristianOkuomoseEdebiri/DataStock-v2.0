@@ -123,6 +123,11 @@ public class MenuPrincipal {
                     menuProducto();
                 }
 
+                case 5 -> {
+                    menuconsultaProducto();
+                }
+
+
                 default -> {
                     throw new IllegalStateException("Opción inesperada");
                 }
@@ -332,6 +337,42 @@ public class MenuPrincipal {
             
         } while (opcion != 0);
     }
+
+    private void menuconsultaProducto() {
+        int opcion;
+        do {
+            System.out.println("1. Listar todos los productos");
+            System.out.println("2. Buscar producto por codigo");
+            System.out.println("3. Buscar productos por nombre");
+            System.out.println("4. Consultar productos con stock inferior a un umbral");
+            System.out.println("0. Volver al menu MySQL");
+            opcion = LectorConsola.leerOpcion("Selecciona una opcion", 0, 4);
+            
+            switch (opcion) {
+                case 1 -> {
+                    gestorBD.listarProductos();
+                }
+                case 2 -> {
+                    gestorBD.consultaProductoPorCodigo(); // reutilizamos el metodo
+                }
+                case 3 -> {
+                    gestorBD.buscarProductoPorNombre();
+                }
+                case 4 -> {
+                    gestorBD.consultarProductosPorStockInferior();
+                }
+                case 0 -> {
+                }
+                default ->
+                    throw new IllegalStateException("Opción inesperada");
+            }
+            
+        
+            
+        } while (opcion != 0);
+    }
+
+
 
 
 

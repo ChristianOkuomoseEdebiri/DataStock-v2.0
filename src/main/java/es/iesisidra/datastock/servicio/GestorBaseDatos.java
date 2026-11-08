@@ -108,7 +108,17 @@ public class GestorBaseDatos {
         gestorProductos.eliminarProducto();
     }
 
-    
+    public void listarProductos () {
+        gestorProductos.listarProductos();
+    }
+
+    public void buscarProductoPorNombre () {
+        gestorProductos.buscarProductosPorNombre();
+    }
+
+    public void consultarProductosPorStockInferior () {
+        gestorProductos.consultarProductosStockInferior();
+    }
 
     
     

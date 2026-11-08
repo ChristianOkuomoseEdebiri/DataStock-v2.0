@@ -553,4 +553,166 @@ public class GestorProductos {
         }
     }
 
+    /**
+     * Metodo para listar todos los productos con los nombres de su categoria y proveedor
+     * ordenados por codigo
+     */
+    public void listarProductos() {
+        String listar = "SELECT p.codigo, p.nombre, p.precio, p.stock, p.categoria_id, p.proveedor_id, "
+                      + "c.nombre AS nombre_categoria, pr.nombre AS nombre_proveedor "
+                      + "FROM producto p "
+                      + "INNER JOIN categoria c ON p.categoria_id = c.id "
+                      + "INNER JOIN proveedor pr ON p.proveedor_id = pr.id "
+                      + "ORDER BY p.codigo"; // no pongo ASC ya que por defecto es ascendente
+
+        try (Connection con = ConexionBD.obtenerConexion(); 
+             PreparedStatement psListar = con.prepareStatement(listar);
+             ResultSet rs = psListar.executeQuery()) {
+
+            boolean vacio = true; // si entra en el bucle es que hay por lo menos un producto por lo que no estaria vacio
+
+            while (rs.next()) {
+                vacio = false;
+                String codigo = rs.getString("codigo");
+                String nombre = rs.getString("nombre");
+                BigDecimal precio = rs.getBigDecimal("precio");
+                int stock = rs.getInt("stock");
+                int idCategoria = rs.getInt("categoria_id");
+                String nombreCategoria = rs.getString("nombre_categoria");
+                int idProveedor = rs.getInt("proveedor_id");
+                String nombreProveedor = rs.getString("nombre_proveedor");
+
+                System.out.println("[CODIGO] " + codigo 
+                                 + " [NOMBRE] " + nombre 
+                                 + " [PRECIO] " + precio 
+                                 + " [STOCK] " + stock 
+                                 + " [CATEGORIA] " + idCategoria + " (" + nombreCategoria + ")"
+                                 + " [PROVEEDOR] " + idProveedor + " (" + nombreProveedor + ")");
+            }
+
+            if (vacio) {
+                System.out.println(ColoresConsola.AZUL + "[NO HAY PRODUCTOS REGISTRADOS]" + ColoresConsola.RESET);
+            }
+
+        } catch (SQLException e) {
+            System.out.println(ColoresConsola.ROJO + "[ERROR] " + e.getMessage() + ColoresConsola.RESET);
+        }
+    }
+
+    /**
+     * Metodo para buscar productos cuyo nombre contenga un fragmento de texto
+     */
+    public void buscarProductosPorNombre() {
+        String textoIntroducido = LectorConsola.leerTexto("Introduce el fragmento del nombre a buscar");
+
+        if (textoIntroducido == null || textoIntroducido.trim().isEmpty()) {
+            System.out.println(ColoresConsola.ROJO + "[ERROR] El fragmento de busqueda no puede estar vacio" + ColoresConsola.RESET);
+            return;
+        }
+
+        String textoLimpio = textoIntroducido.trim();
+
+        String buscarNombre = "SELECT p.codigo, p.nombre, p.precio, p.stock, p.categoria_id, p.proveedor_id, "
+                            + "c.nombre AS nombre_categoria, pr.nombre AS nombre_proveedor "
+                            + "FROM producto p "
+                            + "INNER JOIN categoria c ON p.categoria_id = c.id "
+                            + "INNER JOIN proveedor pr ON p.proveedor_id = pr.id "
+                            + "WHERE p.nombre LIKE ? "
+                            + "ORDER BY p.codigo";
+
+        try (Connection con = ConexionBD.obtenerConexion(); 
+             PreparedStatement psBuscar = con.prepareStatement(buscarNombre)) {
+
+            // concateno los % para buscar coincidencias parciales en cualquier posicion del nombre
+            psBuscar.setString(1, "%" + textoLimpio + "%");
+
+            try (ResultSet rs = psBuscar.executeQuery()) {
+                boolean vacio = true;
+
+                while (rs.next()) {
+                    vacio = false;
+                    String codigo = rs.getString("codigo");
+                    String nombre = rs.getString("nombre");
+                    BigDecimal precio = rs.getBigDecimal("precio");
+                    int stock = rs.getInt("stock");
+                    int idCategoria = rs.getInt("categoria_id");
+                    String nombreCategoria = rs.getString("nombre_categoria");
+                    int idProveedor = rs.getInt("proveedor_id");
+                    String nombreProveedor = rs.getString("nombre_proveedor");
+
+                    System.out.println("[CODIGO] " + codigo 
+                                     + " [NOMBRE] " + nombre 
+                                     + " [PRECIO] " + precio 
+                                     + " [STOCK] " + stock 
+                                     + " [CATEGORIA] " + idCategoria + " (" + nombreCategoria + ")"
+                                     + " [PROVEEDOR] " + idProveedor + " (" + nombreProveedor + ")");
+                }
+
+                if (vacio) {
+                    System.out.println(ColoresConsola.AZUL + "[NO SE HAN ENCONTRADO PRODUCTOS QUE COINCIDAN CON: " + textoLimpio + "]" + ColoresConsola.RESET);
+                }
+            }
+
+        } catch (SQLException e) {
+            System.out.println(ColoresConsola.ROJO + "[ERROR] " + e.getMessage() + ColoresConsola.RESET);
+        }
+    }
+
+    /**
+     * Metodo para consultar productos con un stock inferior al umbral indicado
+     */
+    public void consultarProductosStockInferior() {
+        int umbral = LectorConsola.leerEntero("Introduce el umbral de stock");
+
+        if (umbral < 0) {
+            System.out.println(ColoresConsola.ROJO + "[ERROR] El umbral no puede ser negativo" + ColoresConsola.RESET);
+            return;
+        }
+
+        String buscarStock = "SELECT p.codigo, p.nombre, p.precio, p.stock, p.categoria_id, p.proveedor_id, "
+                           + "c.nombre AS nombre_categoria, pr.nombre AS nombre_proveedor "
+                           + "FROM producto p "
+                           + "INNER JOIN categoria c ON p.categoria_id = c.id "
+                           + "INNER JOIN proveedor pr ON p.proveedor_id = pr.id "
+                           + "WHERE p.stock < ? "
+                           + "ORDER BY p.stock, p.codigo"; // ordenamos primero por menor stock y luego por codigo
+
+        try (Connection con = ConexionBD.obtenerConexion(); 
+             PreparedStatement psStock = con.prepareStatement(buscarStock)) {
+
+            // establezco el umbral en la posicion de la interrogacion
+            psStock.setInt(1, umbral);
+
+            try (ResultSet rs = psStock.executeQuery()) {
+                boolean vacio = true;
+
+                while (rs.next()) {
+                    vacio = false;
+                    String codigo = rs.getString("codigo");
+                    String nombre = rs.getString("nombre");
+                    BigDecimal precio = rs.getBigDecimal("precio");
+                    int stock = rs.getInt("stock");
+                    int idCategoria = rs.getInt("categoria_id");
+                    String nombreCategoria = rs.getString("nombre_categoria");
+                    int idProveedor = rs.getInt("proveedor_id");
+                    String nombreProveedor = rs.getString("nombre_proveedor");
+
+                    System.out.println("[CODIGO] " + codigo 
+                                     + " [NOMBRE] " + nombre 
+                                     + " [PRECIO] " + precio 
+                                     + " [STOCK] " + stock 
+                                     + " [CATEGORIA] " + idCategoria + " (" + nombreCategoria + ")"
+                                     + " [PROVEEDOR] " + idProveedor + " (" + nombreProveedor + ")");
+                }
+
+                if (vacio) {
+                    System.out.println(ColoresConsola.AZUL + "[NO HAY PRODUCTOS CON STOCK INFERIOR A " + umbral + "]" + ColoresConsola.RESET);
+                }
+            }
+
+        } catch (SQLException e) {
+            System.out.println(ColoresConsola.ROJO + "[ERROR] " + e.getMessage() + ColoresConsola.RESET);
+        }
+    }
+
 }
