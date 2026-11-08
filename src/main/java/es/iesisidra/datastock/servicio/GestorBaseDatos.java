@@ -13,6 +13,7 @@ public class GestorBaseDatos {
     private GestorCategorias gestorCategorias = new GestorCategorias();
     private GestorProveedores gestorProveedores = new GestorProveedores();
     private GestorProductos gestorProductos = new GestorProductos();
+    private GestorMovimientos gestorMovimientos = new GestorMovimientos();
 
     public void comprobarConexion() {
         System.out.println("Comprobando conexión...");
@@ -120,6 +121,16 @@ public class GestorBaseDatos {
         gestorProductos.consultarProductosStockInferior();
     }
 
+
+    // movimiento de stock
+    public void registrarEntrada () {
+        gestorMovimientos.registrarEntrada();
+
+    }
+
+    public void registrarSalida () {
+        gestorMovimientos.registrarSalida();
+    }
     
     
 

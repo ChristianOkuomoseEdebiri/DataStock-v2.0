@@ -127,6 +127,10 @@ public class MenuPrincipal {
                     menuconsultaProducto();
                 }
 
+                case 6 -> {
+                    menuRegistros();
+                }
+
 
                 default -> {
                     throw new IllegalStateException("Opción inesperada");
@@ -360,6 +364,32 @@ public class MenuPrincipal {
                 }
                 case 4 -> {
                     gestorBD.consultarProductosPorStockInferior();
+                }
+                case 0 -> {
+                }
+                default ->
+                    throw new IllegalStateException("Opción inesperada");
+            }
+            
+        
+            
+        } while (opcion != 0);
+    }
+
+    private void menuRegistros() {
+        int opcion;
+        do {
+            System.out.println("1. Registrar una ENTRADA de stock");
+            System.out.println("2. Registrar una SALIDA de stock");
+            opcion = LectorConsola.leerOpcion("Selecciona una opcion", 0, 2);
+            
+            switch (opcion) {
+                case 1 -> {
+                    gestorBD.registrarEntrada();
+                }
+                case 2 -> {
+                    gestorBD.registrarSalida();
+                    
                 }
                 case 0 -> {
                 }
