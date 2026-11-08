@@ -12,6 +12,7 @@ import es.iesisidra.datastock.util.ColoresConsola;
 import es.iesisidra.datastock.util.LectorConsola;
 
 public class GestorMovimientos {
+
     /**
      * Metodo para registrar una ENTRADA de stock llamando al metodo comun
      */
@@ -45,12 +46,9 @@ public class GestorMovimientos {
 
         String sqlProducto = "SELECT nombre, stock FROM producto WHERE codigo = ?";
         String sqlProcedimiento = "{CALL registrar_movimiento(?, ?, ?)}";
-        String sqlUltimoMovimiento = "SELECT id, fecha FROM movimiento_stock WHERE producto_codigo = ? ORDER BY id DESC LIMIT 1"; 
+        String sqlUltimoMovimiento = "SELECT id, fecha FROM movimiento_stock WHERE producto_codigo = ? ORDER BY id DESC LIMIT 1";
 
-        try (Connection con = ConexionBD.obtenerConexion();
-             PreparedStatement psProducto = con.prepareStatement(sqlProducto);
-             CallableStatement csMovimiento = con.prepareCall(sqlProcedimiento);
-             PreparedStatement psUltimoMov = con.prepareStatement(sqlUltimoMovimiento)) {
+        try (Connection con = ConexionBD.obtenerConexion(); PreparedStatement psProducto = con.prepareStatement(sqlProducto); CallableStatement csMovimiento = con.prepareCall(sqlProcedimiento); PreparedStatement psUltimoMov = con.prepareStatement(sqlUltimoMovimiento)) {
 
             // 1. Compruebo que el producto existe y obtengo su nombre y stock actual
             psProducto.setString(1, codigoLimpio);
@@ -115,15 +113,124 @@ public class GestorMovimientos {
             }
 
             // muestro el resumen final como pide el enunciado
-            System.out.println(ColoresConsola.VERDE + "RESUMEN -> [TIPO] " + tipo 
-                             + " [STOCK ANTERIOR] " + stockAnterior 
-                             + " [CANTIDAD] " + cantidad 
-                             + " [STOCK POSTERIOR] " + stockPosterior + ColoresConsola.RESET);
+            System.out.println(ColoresConsola.VERDE + "RESUMEN -> [TIPO] " + tipo
+                    + " [STOCK ANTERIOR] " + stockAnterior
+                    + " [CANTIDAD] " + cantidad
+                    + " [STOCK POSTERIOR] " + stockPosterior + ColoresConsola.RESET);
 
         } catch (SQLException e) {
             // si el procedimiento almacenado lanza SIGNAL SQLSTATE (ej. stock insuficiente), cae aqui y se muestra en rojo
             System.out.println(ColoresConsola.ROJO + "[ERROR] " + e.getMessage() + ColoresConsola.RESET);
         }
     }
-    
+
+    /**
+     * Metodo para consultar todos los movimientos registrados en la base de
+     * datos ordenados por fecha e ID de forma estable
+     */
+    public void consultarTodosLosMovimientos() {
+        // ordeno por fecha y luego por id sin poner ASC ya que por defecto es ascendente
+        String listar = "SELECT id, fecha, producto_codigo, tipo, cantidad, stock_anterior, stock_posterior "
+                + "FROM movimiento_stock "
+                + "ORDER BY fecha, id";
+
+        try (Connection con = ConexionBD.obtenerConexion(); PreparedStatement psListar = con.prepareStatement(listar); ResultSet rs = psListar.executeQuery()) {
+
+            boolean vacio = true; // si entra en el bucle es que hay por lo menos un movimiento registrado
+
+            while (rs.next()) {
+                vacio = false;
+                long id = rs.getLong("id"); // uso long porque en la BD el id es BIGINT
+                Timestamp fecha = rs.getTimestamp("fecha");
+                String codigoProducto = rs.getString("producto_codigo");
+                String tipo = rs.getString("tipo");
+                int cantidad = rs.getInt("cantidad");
+                int stockAnterior = rs.getInt("stock_anterior");
+                int stockPosterior = rs.getInt("stock_posterior");
+
+                System.out.println("[ID] " + id
+                        + " [FECHA] " + fecha
+                        + " [CODIGO] " + codigoProducto
+                        + " [TIPO] " + tipo
+                        + " [CANTIDAD] " + cantidad
+                        + " [STOCK ANTERIOR] " + stockAnterior
+                        + " [STOCK POSTERIOR] " + stockPosterior);
+            }
+
+            if (vacio) {
+                System.out.println(ColoresConsola.AZUL + "Sin movimientos registrados" + ColoresConsola.RESET);
+            }
+
+        } catch (SQLException e) {
+            System.out.println(ColoresConsola.ROJO + "[ERROR] " + e.getMessage() + ColoresConsola.RESET);
+        }
+    }
+
+    /**
+     * Metodo para consultar el historial de movimientos de un producto concreto
+     * comprobando primero que el producto exista en la base de datos
+     */
+    public void consultarMovimientosPorProducto() {
+        String codigoIntroducido = LectorConsola.leerTexto("Introduce el codigo del producto");
+
+        if (codigoIntroducido == null || codigoIntroducido.trim().isEmpty()) {
+            System.out.println(ColoresConsola.ROJO + "[ERROR] El codigo no puede estar vacio" + ColoresConsola.RESET);
+            return;
+        }
+
+        // normalizo el codigo quitando espacios y pasandolo a mayusculas
+        String codigoLimpio = codigoIntroducido.trim().toUpperCase();
+
+        String buscarProducto = "SELECT codigo FROM producto WHERE codigo = ?";
+        String listarMovimientos = "SELECT id, fecha, producto_codigo, tipo, cantidad, stock_anterior, stock_posterior "
+                + "FROM movimiento_stock "
+                + "WHERE producto_codigo = ? "
+                + "ORDER BY fecha, id";
+
+        try (Connection con = ConexionBD.obtenerConexion(); PreparedStatement psProducto = con.prepareStatement(buscarProducto); PreparedStatement psMovimientos = con.prepareStatement(listarMovimientos)) {
+
+            // 1. Primero compruebo si el producto existe en la tabla producto
+            psProducto.setString(1, codigoLimpio);
+            try (ResultSet rsProd = psProducto.executeQuery()) {
+                if (!rsProd.next()) { // si no devuelve nada es que el producto no existe
+                    System.out.println(ColoresConsola.ROJO + "[ERROR] No existe ningun producto con el codigo: " + codigoLimpio + ColoresConsola.RESET);
+                    return;
+                }
+            }
+
+            // 2. Si el producto existe, consulto sus movimientos asociados
+            psMovimientos.setString(1, codigoLimpio);
+            try (ResultSet rsMov = psMovimientos.executeQuery()) {
+                boolean vacio = true;
+
+                while (rsMov.next()) {
+                    vacio = false;
+                    long id = rsMov.getLong("id");
+                    Timestamp fecha = rsMov.getTimestamp("fecha");
+                    String codigoProducto = rsMov.getString("producto_codigo");
+                    String tipo = rsMov.getString("tipo");
+                    int cantidad = rsMov.getInt("cantidad");
+                    int stockAnterior = rsMov.getInt("stock_anterior");
+                    int stockPosterior = rsMov.getInt("stock_posterior");
+
+                    System.out.println("[ID] " + id
+                            + " [FECHA] " + fecha
+                            + " [CODIGO] " + codigoProducto
+                            + " [TIPO] " + tipo
+                            + " [CANTIDAD] " + cantidad
+                            + " [STOCK ANTERIOR] " + stockAnterior
+                            + " [STOCK POSTERIOR] " + stockPosterior);
+                }
+
+                // si el producto existe pero no entro en el while, informamos de que no tiene movimientos
+                if (vacio) {
+                    System.out.println(ColoresConsola.AZUL + "Sin movimientos registrados" + ColoresConsola.RESET);
+                }
+            }
+
+        } catch (SQLException e) {
+            System.out.println(ColoresConsola.ROJO + "[ERROR] " + e.getMessage() + ColoresConsola.RESET);
+        }
+    }
+
 }

@@ -5,8 +5,10 @@ import java.sql.DatabaseMetaData;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.List;
 
 import es.iesisidra.datastock.config.ConexionBD;
+import es.iesisidra.datastock.modelo.Producto;
 import es.iesisidra.datastock.util.ColoresConsola;
 
 public class GestorBaseDatos {
@@ -121,16 +123,29 @@ public class GestorBaseDatos {
         gestorProductos.consultarProductosStockInferior();
     }
 
+    public void copiarInventarioAMySQL (List<Producto> listaMemoria) {
+        gestorProductos.copiarInventarioAMySQL(listaMemoria);
+    }
 
-    // movimiento de stock
+
+    // movimientos
     public void registrarEntrada () {
         gestorMovimientos.registrarEntrada();
-
     }
 
     public void registrarSalida () {
         gestorMovimientos.registrarSalida();
     }
+
+    public void consultarTodosLosMovimientos () {
+        gestorMovimientos.consultarTodosLosMovimientos();
+    }
+
+    public void consultarMovimientosPorProducto () {
+        gestorMovimientos.consultarMovimientosPorProducto();
+    }
+
+
     
     
 

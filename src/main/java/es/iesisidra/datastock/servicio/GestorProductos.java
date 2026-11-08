@@ -715,4 +715,124 @@ public class GestorProductos {
         }
     }
 
+    /**
+     * Metodo para copiar los productos del inventario en memoria (UT1) a MySQL
+     * dentro de una unica transaccion
+     *
+     * @param listaMemoria la lista de productos de la UT1
+     */
+    public void copiarInventarioAMySQL(List<Producto> listaMemoria) {
+        // 1. Comprobacion inicial
+        if (listaMemoria == null || listaMemoria.isEmpty()) {
+            System.out.println(ColoresConsola.AZUL + "[AVISO] No hay productos para importar" + ColoresConsola.RESET);
+            return;
+        }
+
+        System.out.println("NUMERO DE PRODUCTOS EN MEMORIA PARA IMPORTAR: " + listaMemoria.size());
+
+        if (!LectorConsola.confirmar("CONFIRMA LA IMPORTACION A MYSQL S/N")) {
+            System.out.println(ColoresConsola.VERDE + "RECIBIDO, SALIENDO..." + ColoresConsola.RESET);
+            return;
+        }
+
+        String buscarCodigo = "SELECT * FROM producto WHERE codigo = ?";
+        String referenciaCategoria = "SELECT * FROM categoria WHERE id = ?";
+        String referenciaProveedor = "SELECT * FROM proveedor WHERE id = ?";
+        String insertarProducto = "INSERT INTO producto (codigo, nombre, precio, stock, categoria_id, proveedor_id) VALUES (?, ?, ?, ?, ?, ?)";
+
+        int insertados = 0;
+        int omitidos = 0;
+        int rechazados = 0;
+
+        try (Connection con = ConexionBD.obtenerConexion()) {
+            // desactivamos el autocommit para que todo el lote vaya en una unica transaccion
+            con.setAutoCommit(false);
+
+            try (PreparedStatement psCodigo = con.prepareStatement(buscarCodigo);
+                 PreparedStatement psCategoria = con.prepareStatement(referenciaCategoria);
+                 PreparedStatement psProveedor = con.prepareStatement(referenciaProveedor);
+                 PreparedStatement psInsertar = con.prepareStatement(insertarProducto)) {
+
+                for (Producto p : listaMemoria) {
+
+                    // compruebo si el codigo ya existe en MySQL (los duplicados se omiten)
+                    if (p.getCodigo() != null && !p.getCodigo().trim().isEmpty()) {
+                        psCodigo.setString(1, p.getCodigo().trim().toUpperCase());
+                        try (ResultSet rs = psCodigo.executeQuery()) {
+                            if (rs.next()) { // si ya existe en la BD lo omitimos y pasamos al siguiente
+                                System.out.println(ColoresConsola.AZUL + "[OMITIDO] El producto con codigo " + p.getCodigo() + " ya existe en MySQL" + ColoresConsola.RESET);
+                                omitidos++;
+                                continue;
+                            }
+                        }
+                    }
+
+                    // compruebo si cumple las reglas de negocio reutilizando validarProducto(p)
+                    List<String> errores = validarProducto(p);
+                    if (!errores.isEmpty()) { // caso malo: se rechaza e indicamos el motivo
+                        System.out.println(ColoresConsola.ROJO + "== PRODUCTO " + p.getCodigo() + " RECHAZADO POR ERRORES ==" + ColoresConsola.RESET);
+                        for (String error : errores) {
+                            System.out.println(ColoresConsola.ROJO + "- " + error + " -" + ColoresConsola.RESET);
+                        }
+                        rechazados++;
+                        continue;
+                    }
+
+                    // compruebo si la categoria existe en MySQL
+                    psCategoria.setInt(1, p.getCategoriaId());
+                    try (ResultSet rs = psCategoria.executeQuery()) {
+                        if (!rs.next()) { // si no hay nada
+                            System.out.println(ColoresConsola.ROJO + "[RECHAZADO] Producto " + p.getCodigo() + ": el ID de la categoria no existe" + ColoresConsola.RESET);
+                            rechazados++;
+                            continue;
+                        }
+                    }
+
+                    // compruebo si el proveedor existe en MySQL
+                    psProveedor.setInt(1, p.getProveedorId());
+                    try (ResultSet rs = psProveedor.executeQuery()) {
+                        if (!rs.next()) { // si no hay nada
+                            System.out.println(ColoresConsola.ROJO + "[RECHAZADO] Producto " + p.getCodigo() + ": el ID del proveedor no existe" + ColoresConsola.RESET);
+                            rechazados++;
+                            continue;
+                        }
+                    }
+
+                    // si llego hasta aqui hemos pasado todas las validaciones, introducimos el producto
+                    psInsertar.setString(1, p.getCodigo().trim().toUpperCase());
+                    psInsertar.setString(2, p.getNombre().trim());
+                    psInsertar.setBigDecimal(3, p.getPrecio());
+                    psInsertar.setInt(4, p.getStock());
+                    psInsertar.setInt(5, p.getCategoriaId());
+                    psInsertar.setInt(6, p.getProveedorId());
+
+                    psInsertar.executeUpdate();
+                    insertados++;
+                    System.out.println(ColoresConsola.VERDE + "[OK] Producto " + p.getCodigo() + " preparado para importar" + ColoresConsola.RESET);
+                }
+
+                // confirmamos todas las inserciones del lote al terminar el bucle
+                con.commit();
+
+                // resumen final
+                System.out.println(ColoresConsola.VERDE + "[OK] IMPORTACION FINALIZADA -> Insertados: " + insertados + ColoresConsola.RESET);
+                System.out.println(ColoresConsola.AZUL + "Omitidos por duplicado: " + omitidos + ColoresConsola.RESET);
+                System.out.println(ColoresConsola.ROJO + "Rechazados por otras causas: " + rechazados + ColoresConsola.RESET);
+
+            } catch (SQLException e) {
+                // si ocurre un error SQL inesperado deshacemos todo el lote con rollback
+                con.rollback();
+                System.out.println(ColoresConsola.ROJO + "[ERROR] Error SQL inesperado. Se ha realizado ROLLBACK y no se ha confirmado ninguna insercion del lote: " + e.getMessage() + ColoresConsola.RESET);
+            }
+
+        } catch (SQLException e) {
+            System.out.println(ColoresConsola.ROJO + "[ERROR] " + e.getMessage() + ColoresConsola.RESET);
+        }
+    }
+
+
+
+
+
+
 }

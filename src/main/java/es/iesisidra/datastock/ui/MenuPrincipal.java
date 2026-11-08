@@ -131,6 +131,18 @@ public class MenuPrincipal {
                     menuRegistros();
                 }
 
+                case 7 -> {
+                    menuHistorial();
+                }
+
+                case 8 -> {
+                    gestorBD.copiarInventarioAMySQL(inventario.getProductos());
+                }
+
+                case 9 -> {
+                    
+                }
+
 
                 default -> {
                     throw new IllegalStateException("Opción inesperada");
@@ -389,6 +401,32 @@ public class MenuPrincipal {
                 }
                 case 2 -> {
                     gestorBD.registrarSalida();
+                    
+                }
+                case 0 -> {
+                }
+                default ->
+                    throw new IllegalStateException("Opción inesperada");
+            }
+            
+        
+            
+        } while (opcion != 0);
+    }
+
+    private void menuHistorial() {
+        int opcion;
+        do {
+            System.out.println("1. Consultar todos los movimientos");
+            System.out.println("2. Consultar movimientos de un producto");
+            opcion = LectorConsola.leerOpcion("Selecciona una opcion", 0, 2);
+            
+            switch (opcion) {
+                case 1 -> {
+                    gestorBD.consultarTodosLosMovimientos();
+                }
+                case 2 -> {
+                    gestorBD.consultarMovimientosPorProducto();
                     
                 }
                 case 0 -> {
