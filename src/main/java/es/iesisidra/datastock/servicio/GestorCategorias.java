@@ -275,6 +275,141 @@ public class GestorCategorias {
 
     }
 
+    /**
+     * Metodo: demostracion de transacciones JDBC
+     * Documentacion a tener en cuenta: se utilizan los IDs 500, 501 y 502.
+     * Realmente solo se llegan a introducir 500 y 501 por lo tanto si queremos eliminarlos tenemos el metodo eliminarCategoria al que le debemos de proporcionar los IDs
+     * No se utilizan IDs que puedan afectar a datos reales
+     */
+
+    public void transacciones () {
+        String comprobar = "SELECT id FROM categoria WHERE id IN (?, ?, ?)";// vamos a usar IDs que no esten usados
+        try (Connection con = ConexionBD.obtenerConexion(); PreparedStatement ps = con.prepareStatement(comprobar)
+            ) {
+                
+                // usamos 500, 501 y 502 ya que son IDscon una probabilidad casi nula de ser usados
+                ps.setInt(1, 500);
+                ps.setInt(2, 501);
+                ps.setInt(3, 502);
+
+                try (ResultSet rs = ps.executeQuery()) {
+                    if (!rs.next()) {
+                        System.out.println("Categorias disponibles con id = 500, 501 y 502");
+                    }
+                    else {
+                        System.out.println("No hay categorias disponibles");
+                        return;
+                    }
+                }
+
+                System.out.println("SE VAN A INSERTAR TRES CATEGORIAS DE PRUEBA CON LOS IDs 500, 501 y 502. (NO DEBEN ESTAR EN USO)");
+                
+                System.out.println("EN LA PRIMERA TRANSACCION SE INTRODUCIRAN DOS CATEGORIAS CON IDs = 500 y 501");
+
+                System.out.println("EN LA SEGUNDA TRANSACCION SE INTRODUCIRA 502 DOS VECES PROVOCANDO DE MANERA INTENCIONADA UN FALLO Y HACIENDO UN ROLLBACK");
+
+                // pedimos permiso
+                if (!LectorConsola.confirmar("DESEAS CONTINUAR S/N")) {
+                    System.out.println(ColoresConsola.VERDE + "[OK] SALIENDO..." + ColoresConsola.RESET);
+                    return;
+                }
+                
+
+                // desactivamos el autocommit
+                con.setAutoCommit(false);
+
+                // caso A
+                String insertar = "INSERT INTO categoria (id, nombre) VALUES (?, ?)";
+                String comprobarInsercion = "SELECT * FROM categoria WHERE id IN (?, ?)";
+                try (PreparedStatement psInsertar = con.prepareStatement(insertar);
+                PreparedStatement psComprobar = con.prepareStatement(comprobarInsercion)) {
+                    // como avisamos insertamos las dos primeras categorias
+                    psInsertar.setInt(1, 500);
+                    psInsertar.setString(2, "PRUEBA500");
+                    psInsertar.executeUpdate();
+
+                    psInsertar.setInt(1, 501);
+                    psInsertar.setString(2, "PRUEBA501");
+                    psInsertar.executeUpdate();
+
+                    // hacemos commit y comprobamos
+                    con.commit();
+
+                    psComprobar.setInt(1, 500);
+                    psComprobar.setInt(2, 501);
+
+                    try (ResultSet rs = psComprobar.executeQuery()) {
+                        int encontrados = 0;
+                        while (rs.next()) {
+                            encontrados++;
+                            System.out.println("[NOMBRE] " + rs.getString("nombre") + " [ID] " + rs.getInt("id"));
+                        } if (encontrados != 2) {
+                            System.out.println(ColoresConsola.ROJO + "NO SE ENCONTRARON LAS DOS CATEGORIAS INTRODUCIDAS" + ColoresConsola.RESET);
+                            return;
+                        } else {
+                            System.out.println(ColoresConsola.VERDE + "[OK] ENCONTRADOS CORRECTAMENTE" + ColoresConsola.RESET);
+                        }
+                        
+                    }
+
+                    
+                } catch (SQLException se) {
+                    System.out.println(ColoresConsola.ROJO + "[ERROR] no se pudo introducir, realizando rollback" + se.getMessage() + ColoresConsola.RESET);
+                    con.rollback();
+                }
+
+                // caso B
+                try (PreparedStatement psInsertar = con.prepareStatement(insertar)) {
+                    // como avisamos insertamos la misma categoria dos veces
+                    psInsertar.setInt(1, 502);
+                    psInsertar.setString(2, "PRUEBA502");
+                    psInsertar.executeUpdate();
+
+                    psInsertar.setInt(1, 502);
+                    psInsertar.setString(2, "PRUEBA502");
+                    psInsertar.executeUpdate();
+
+                    // no deberia de permitirnos hacer el commit
+                    con.commit();
+
+                    
+                } catch (SQLException sqle) {
+                    System.out.println(ColoresConsola.ROJO + "[ERROR] CLAVE CUPLICADA" + sqle.getMessage() + ColoresConsola.RESET);
+                    con.rollback();
+                   
+                }
+
+                // compruebo que no se haya insertado
+                String comprobarInsercionFinal = "SELECT * FROM categoria WHERE id = ?";
+                try (PreparedStatement pscomprobarInsercionFinal = con.prepareStatement(comprobarInsercionFinal)) {
+                    pscomprobarInsercionFinal.setInt(1, 502);
+                    
+                    try (ResultSet rs = pscomprobarInsercionFinal.executeQuery()) {
+                        if (rs.next()) {
+                            System.out.println(ColoresConsola.ROJO + "[ERROR] SE HA ENCONTRADO UNA CATEGORIA CON EL ID 502" + ColoresConsola.RESET);
+
+                        } else {
+                            System.out.println(ColoresConsola.VERDE + "[OK] EL ROLLBACK FUNCIONO CORRECTAMENTE" + ColoresConsola.RESET);
+                        }
+                        
+                    }
+
+
+                }
+
+                con.setAutoCommit(true);
+
+
+            
+        } catch (SQLException e) {
+            System.out.println(ColoresConsola.ROJO + "[ERROR] " + e.getMessage() + ColoresConsola.RESET);
+
+        }
+        
+    }
+
+
+
 
 
 }
