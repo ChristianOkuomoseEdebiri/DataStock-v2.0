@@ -76,6 +76,10 @@ public class GestorBaseDatos {
         gestorCategorias.eliminarCategoria(id);
     }
 
+    public void transacciones () {
+        gestorCategorias.transacciones();
+    }
+
     // metodos correspondientes a proveedor
     public void altaProveedor (int id, String nombre) {
         gestorProveedores.altaProveedor(id, nombre);

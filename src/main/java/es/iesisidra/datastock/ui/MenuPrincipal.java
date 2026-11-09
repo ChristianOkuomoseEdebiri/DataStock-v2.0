@@ -140,6 +140,7 @@ public class MenuPrincipal {
                 }
 
                 case 9 -> {
+                    gestorBD.transacciones();
                     
                 }
 
