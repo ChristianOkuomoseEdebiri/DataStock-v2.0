@@ -11,11 +11,11 @@ import es.iesisidra.datastock.util.LectorConsola;
 
 public class GestorProveedores {
 
-    /**
+   /**
      * Metodo para dar de alta a proveedores
      *
      * @param id el id del proveedor nuevo
-     * @param nombre el nombre de la categoria nueva
+     * @param nombre el nombre del proveedor nuevo
      */
     public void altaProveedor(int id, String nombre) {
         // identificador positivo
@@ -38,82 +38,80 @@ public class GestorProveedores {
         }
 
         boolean correoEsNulo = true;
-        String correo = null; // solo llega a ser null si no se quiere introducir
         String correoNoNulo = "";
 
         if (LectorConsola.confirmar("Se va a introducir un correo electronico? -> S/N")) {
-            correo = LectorConsola.leerTexto("Introduce el correo");
+            String correo = LectorConsola.leerTexto("Introduce el correo");
 
-            if (correo == null || correo.trim().isEmpty()) { // teoricamente puede ser nulo pero no debe de serlo si accede a introducirlo
+            if (correo == null || correo.trim().isEmpty()) {
                 System.out.println(ColoresConsola.ROJO + "[ERROR] El correo no puede ser nulo/estar vacio (en caso de haber pulsado S)" + ColoresConsola.RESET);
                 return;
             }
 
-            correoEsNulo = false;
             correoNoNulo = correo.trim();
 
             // comprobamos que coincida con el patron
-
             if (!correoNoNulo.matches("^[^@\\s]+@[^@\\s]+\\.[^@\\s]+$")) {
                 System.out.println(ColoresConsola.ROJO + "[ERROR] El correo no cumple con el formato valido" + ColoresConsola.RESET);
                 return;
-
             }
 
             // cumple el tamaño
-
             if (correoNoNulo.length() < 1 || correoNoNulo.length() > 120) {
                 System.out.println(ColoresConsola.ROJO + "[ERROR] El email debe de estar entre 1 a 120 caracteres" + ColoresConsola.RESET);
                 return;
             }
 
-            // llegados aqui debemos conectarnos con la base de datos y comprobar que no existe el id ni otra categoria con el mismo nombre
-            String consultaID = "SELECT * FROM proveedor WHERE ID = ?";
-            String consultaCorreo = "SELECT * FROM proveedor WHERE email = ?";
-            String insertarProveedor = "INSERT INTO proveedor (id, nombre, email) VALUES (?, ?, ?)";
+            correoEsNulo = false;
+        }
 
-            try (Connection con = ConexionBD.obtenerConexion(); PreparedStatement psID = con.prepareStatement(consultaID); PreparedStatement psInsertar = con.prepareStatement(insertarProveedor); PreparedStatement psCorreo = con.prepareStatement(consultaCorreo)) {
+        String consultaID = "SELECT * FROM proveedor WHERE ID = ?";
+        String consultaCorreo = "SELECT * FROM proveedor WHERE email = ?";
+        String insertarProveedor = "INSERT INTO proveedor (id, nombre, email) VALUES (?, ?, ?)";
 
-                // establezco el id en la posicion de la interrogacion
-                psID.setInt(1, id);
+        try (Connection con = ConexionBD.obtenerConexion(); 
+             PreparedStatement psID = con.prepareStatement(consultaID); 
+             PreparedStatement psInsertar = con.prepareStatement(insertarProveedor); 
+             PreparedStatement psCorreo = con.prepareStatement(consultaCorreo)) {
 
-                try (ResultSet rs = psID.executeQuery()) {
+            // establezco el id en la posicion de la interrogacion
+            psID.setInt(1, id);
+
+            try (ResultSet rs = psID.executeQuery()) {
+                if (rs.next()) { // si hay algo en la consulta es que ha devuelto un proveedor por lo tango no deberia de seguir
+                    System.out.println(ColoresConsola.ROJO + "[ERROR] Existe un proveedor con ese ID" + ColoresConsola.RESET);
+                    return;
+                }
+            }
+
+            if (!correoEsNulo) { // si no no hace falta buscarlo
+                // igual pero con el proveedor
+                psCorreo.setString(1, correoNoNulo);
+                try (ResultSet rs = psCorreo.executeQuery()) {
                     if (rs.next()) { // si hay algo en la consulta es que ha devuelto un proveedor por lo tango no deberia de seguir
-                        System.out.println(ColoresConsola.ROJO + "[ERROR] Existe un proveedor con ese ID" + ColoresConsola.RESET);
+                        System.out.println(ColoresConsola.ROJO + "[ERROR] Existe un proveedor con ese email" + ColoresConsola.RESET);
                         return;
                     }
                 }
-
-                if (!correoEsNulo) { // si no no hace falta buscarlo
-                    // igual pero con el proveedor
-                    psCorreo.setString(1, correoNoNulo);
-                    try (ResultSet rs = psCorreo.executeQuery()) {
-                        if (rs.next()) { // si hay algo en la consulta es que ha devuelto un proveedor por lo tango no deberia de seguir
-                            System.out.println(ColoresConsola.ROJO + "[ERROR] Existe un proveedor con ese email" + ColoresConsola.RESET);
-                            return;
-                        }
-                    }
-                }
-
-                psInsertar.setInt(1, id);
-                psInsertar.setString(2, nombreNoNulo);
-
-                if (correoEsNulo) { // si es nullo introduzco null directamente
-                    psInsertar.setString(3, null);
-                } else {
-                    psInsertar.setString(3, correoNoNulo.trim());
-                }
-
-                // aplico cambios
-
-                int filasInsertadas = psInsertar.executeUpdate();
-
-                System.out.println(ColoresConsola.VERDE + "[PROVEEDOR INSERTADO CORRECTAMENTE] filas insertadas: " + filasInsertadas + ColoresConsola.RESET);
-
-            } catch (SQLException e) {
-                System.out.println(ColoresConsola.ROJO + "[ERROR] " + e.getMessage() + ColoresConsola.RESET);
-
             }
+
+            psInsertar.setInt(1, id);
+            psInsertar.setString(2, nombreNoNulo);
+
+            if (correoEsNulo) { // si es nullo introduzco null directamente
+                psInsertar.setString(3, null);
+            } else {
+                psInsertar.setString(3, correoNoNulo.trim());
+            }
+
+            // aplico cambios
+
+            int filasInsertadas = psInsertar.executeUpdate();
+
+            System.out.println(ColoresConsola.VERDE + "[PROVEEDOR INSERTADO CORRECTAMENTE] filas insertadas: " + filasInsertadas + ColoresConsola.RESET);
+
+        } catch (SQLException e) {
+            System.out.println(ColoresConsola.ROJO + "[ERROR] " + e.getMessage() + ColoresConsola.RESET);
 
         }
 
@@ -376,7 +374,6 @@ public class GestorProveedores {
             }
 
             // en caso de llegar aqui eliminamos
-
             psEliminar.setInt(1, id);
             int filasAfectadas = psEliminar.executeUpdate();
 

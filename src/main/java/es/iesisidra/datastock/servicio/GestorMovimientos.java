@@ -113,10 +113,7 @@ public class GestorMovimientos {
             }
 
             // muestro el resumen final como pide el enunciado
-            System.out.println(ColoresConsola.VERDE + "RESUMEN -> [TIPO] " + tipo
-                    + " [STOCK ANTERIOR] " + stockAnterior
-                    + " [CANTIDAD] " + cantidad
-                    + " [STOCK POSTERIOR] " + stockPosterior + ColoresConsola.RESET);
+            System.out.println(ColoresConsola.VERDE + "RESUMEN -> [TIPO] " + tipo + " [STOCK ANTERIOR] " + stockAnterior + " [CANTIDAD] " + cantidad + " [STOCK POSTERIOR] " + stockPosterior + ColoresConsola.RESET);
 
         } catch (SQLException e) {
             // si el procedimiento almacenado lanza SIGNAL SQLSTATE (ej. stock insuficiente), cae aqui y se muestra en rojo
@@ -130,9 +127,7 @@ public class GestorMovimientos {
      */
     public void consultarTodosLosMovimientos() {
         // ordeno por fecha y luego por id sin poner ASC ya que por defecto es ascendente
-        String listar = "SELECT id, fecha, producto_codigo, tipo, cantidad, stock_anterior, stock_posterior "
-                + "FROM movimiento_stock "
-                + "ORDER BY fecha, id";
+        String listar = "SELECT id, fecha, producto_codigo, tipo, cantidad, stock_anterior, stock_posterior FROM movimiento_stock ORDER BY fecha, id";
 
         try (Connection con = ConexionBD.obtenerConexion(); PreparedStatement psListar = con.prepareStatement(listar); ResultSet rs = psListar.executeQuery()) {
 
@@ -148,13 +143,7 @@ public class GestorMovimientos {
                 int stockAnterior = rs.getInt("stock_anterior");
                 int stockPosterior = rs.getInt("stock_posterior");
 
-                System.out.println("[ID] " + id
-                        + " [FECHA] " + fecha
-                        + " [CODIGO] " + codigoProducto
-                        + " [TIPO] " + tipo
-                        + " [CANTIDAD] " + cantidad
-                        + " [STOCK ANTERIOR] " + stockAnterior
-                        + " [STOCK POSTERIOR] " + stockPosterior);
+                System.out.println("[ID] " + id + " [FECHA] " + fecha + " [CODIGO] " + codigoProducto + " [TIPO] " + tipo + " [CANTIDAD] " + cantidad + " [STOCK ANTERIOR] " + stockAnterior + " [STOCK POSTERIOR] " + stockPosterior);
             }
 
             if (vacio) {
@@ -182,10 +171,7 @@ public class GestorMovimientos {
         String codigoLimpio = codigoIntroducido.trim().toUpperCase();
 
         String buscarProducto = "SELECT codigo FROM producto WHERE codigo = ?";
-        String listarMovimientos = "SELECT id, fecha, producto_codigo, tipo, cantidad, stock_anterior, stock_posterior "
-                + "FROM movimiento_stock "
-                + "WHERE producto_codigo = ? "
-                + "ORDER BY fecha, id";
+        String listarMovimientos = "SELECT id, fecha, producto_codigo, tipo, cantidad, stock_anterior, stock_posterior FROM movimiento_stock WHERE producto_codigo = ? ORDER BY fecha, id";
 
         try (Connection con = ConexionBD.obtenerConexion(); PreparedStatement psProducto = con.prepareStatement(buscarProducto); PreparedStatement psMovimientos = con.prepareStatement(listarMovimientos)) {
 
@@ -213,13 +199,7 @@ public class GestorMovimientos {
                     int stockAnterior = rsMov.getInt("stock_anterior");
                     int stockPosterior = rsMov.getInt("stock_posterior");
 
-                    System.out.println("[ID] " + id
-                            + " [FECHA] " + fecha
-                            + " [CODIGO] " + codigoProducto
-                            + " [TIPO] " + tipo
-                            + " [CANTIDAD] " + cantidad
-                            + " [STOCK ANTERIOR] " + stockAnterior
-                            + " [STOCK POSTERIOR] " + stockPosterior);
+                    System.out.println("[ID] " + id + " [FECHA] " + fecha + " [CODIGO] " + codigoProducto + " [TIPO] " + tipo + " [CANTIDAD] " + cantidad + " [STOCK ANTERIOR] " + stockAnterior + " [STOCK POSTERIOR] " + stockPosterior);
                 }
 
                 // si el producto existe pero no entro en el while, informamos de que no tiene movimientos

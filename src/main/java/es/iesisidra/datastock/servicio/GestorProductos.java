@@ -445,7 +445,7 @@ public class GestorProductos {
                     }
 
                     // pedimos confirmacion antes de hacer el UPDATE
-                    if (!LectorConsola.confirmar("CONFIRMA EL CAMBIO DE DATOS S/N")) {
+                    if (!LectorConsola.confirmar("[AVISO] CONFIRMA EL CAMBIO DE DATOS S/N")) {
                         System.out.println(ColoresConsola.VERDE + "[RECIBIDO, SALIENDO CORRECTAMENTE...]" + ColoresConsola.RESET);
                         return;
                     }
@@ -457,7 +457,7 @@ public class GestorProductos {
                     psActualizar.setString(5, codigoLimpio);
 
                     int filasAfectadas = psActualizar.executeUpdate();
-                    System.out.println(ColoresConsola.VERDE + "[ACTUALIZADO CORRECTAMENTE] filas afectadas: " + filasAfectadas + ColoresConsola.RESET);
+                    System.out.println(ColoresConsola.VERDE + "[OK ACTUALIZADO CORRECTAMENTE] filas afectadas: " + filasAfectadas + ColoresConsola.RESET);
                 }
             }
 
@@ -640,12 +640,7 @@ public class GestorProductos {
                     int idProveedor = rs.getInt("proveedor_id");
                     String nombreProveedor = rs.getString("nombre_proveedor");
 
-                    System.out.println("[CODIGO] " + codigo 
-                                     + " [NOMBRE] " + nombre 
-                                     + " [PRECIO] " + precio 
-                                     + " [STOCK] " + stock 
-                                     + " [CATEGORIA] " + idCategoria + " (" + nombreCategoria + ")"
-                                     + " [PROVEEDOR] " + idProveedor + " (" + nombreProveedor + ")");
+                    System.out.println("[CODIGO] " + codigo + " [NOMBRE] " + nombre + " [PRECIO] " + precio + " [STOCK] " + stock + " [CATEGORIA] " + idCategoria + " (" + nombreCategoria + ")" + " [PROVEEDOR] " + idProveedor + " (" + nombreProveedor + ")");
                 }
 
                 if (vacio) {
@@ -697,12 +692,7 @@ public class GestorProductos {
                     int idProveedor = rs.getInt("proveedor_id");
                     String nombreProveedor = rs.getString("nombre_proveedor");
 
-                    System.out.println("[CODIGO] " + codigo 
-                                     + " [NOMBRE] " + nombre 
-                                     + " [PRECIO] " + precio 
-                                     + " [STOCK] " + stock 
-                                     + " [CATEGORIA] " + idCategoria + " (" + nombreCategoria + ")"
-                                     + " [PROVEEDOR] " + idProveedor + " (" + nombreProveedor + ")");
+                   System.out.println("[CODIGO] " + codigo + " [NOMBRE] " + nombre + " [PRECIO] " + precio + " [STOCK] " + stock + " [CATEGORIA] " + idCategoria + " (" + nombreCategoria + ")" + " [PROVEEDOR] " + idProveedor + " (" + nombreProveedor + ")");
                 }
 
                 if (vacio) {

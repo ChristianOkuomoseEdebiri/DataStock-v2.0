@@ -115,3 +115,25 @@ DataStock_V2/
 - Se debe ejecutar en MySQL el script que contiene la BD (incluido en material_referencia)
 - Para ejecutar la aplicación, debes crear un archivo **src/main/resources/db.properties** con las variables **db.url, db.username y db.password.** Este archivo está ignorado en Git por seguridad.
 - Si el ID o nombre de alguna de las columnas es invalido no se prosigue con la funcionalidad y no se alteran registros **no se llega a abrir la conexion en ese caso**
+- La funcionalidad de transacciones es una prueba con IDs altos ya que pretende no usar ningun ID que comprometa la funcionalidad del programa en si. Por lo tanto los IDs 500, 501 y 502 deben estar libres.
+- Los productos de la BD y los que estan en inventario no estan obligatoriamente actualizados
+- La prueba de SQLite tiene su propio main y reside en la carpeta de complementarias
+
+
+## Comparativa MySQL y SQLite
+
+| Criterio | MySQL (Gestor Independiente) | SQLite (Gestor Embebido) |
+| :--- | :--- | :--- |
+| **¿Necesita servidor?** | Sí, arquitectura cliente-servidor (requiere proceso activo). | No, motor embebido que se ejecuta dentro de la aplicación. |
+| **¿Dónde se guardan los datos?** | En el directorio de datos gestionado por el servidor MySQL. | En un único fichero local del proyecto (`productos_demo.db`). |
+| **Conexión JDBC** | Red/puerto y credenciales (`jdbc:mysql://localhost:3306/datastock`). | Ruta directa al archivo (`jdbc:sqlite:datos/sqlite/productos_demo.db`). |
+| **Dependencia Maven** | `com.mysql:mysql-connector-j` | `org.xerial:sqlite-jdbc` |
+| **Ventajas** | Alta concurrencia, control de usuarios, procedimientos almacenados y escalabilidad. | Cero configuración, sin servidor, muy ligero y fácil de transportar en un fichero. |
+| **Inconvenientes** | Requiere instalar/mantener un servidor y consume más recursos. | Bloqueo de fichero en escrituras concurrentes, sin gestión de usuarios ni red. |
+| **¿Para qué aplicación lo elegirías?** | Sistemas empresariales multiusuario, backends web y DataStock. | Apps móviles, programas de escritorio monousuario, prototipos y pruebas locales. |
+
+### Pool de conexiones y gestión en DataStock
+
+* **¿Qué es un pool de conexiones?** Es un conjunto (caché) de conexiones a la base de datos que se mantienen abiertas y listas para ser reutilizadas por la aplicación (mediante librerías como HikariCP). En lugar de abrir y cerrar físicamente una conexión de red en cada consulta, el programa toma prestada una conexión libre del pool y la devuelve al terminar.
+* **¿Cuándo resulta útil?** Es imprescindible en aplicaciones web, APIs REST o sistemas empresariales con alta concurrencia donde cientos de usuarios realizan peticiones simultáneas, ya que abrir una conexión física TCP/IP y autenticar credenciales en cada petición es una operación costosa que saturaría el servidor.
+* **¿Por qué DataStock puede funcionar con conexiones cortas y bien cerradas?** Porque DataStock es una aplicación de consola monousuario e interactiva donde las operaciones se ejecutan de una en una a ritmo humano. El volumen de peticiones por segundo es mínimo, por lo que abrir la conexión bajo demanda y cerrarla inmediatamente mediante bloques `try-with-resources` garantiza que no queden recursos bloqueados en el servidor sin penalizar el rendimiento perceptible.

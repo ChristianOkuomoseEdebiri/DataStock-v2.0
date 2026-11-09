@@ -102,7 +102,7 @@ public class MenuPrincipal {
             System.out.println("9. Demostración de transacción con commit/rollback");
             System.out.println("0. Volver al menú principal");
             System.out.println("=========================================");
-            opcion = LectorConsola.leerOpcion("Selecciona una opción: ", 0, 7);
+            opcion = LectorConsola.leerOpcion("Selecciona una opción: ", 0, 9);
 
             switch (opcion) {
                 case 1 -> {
@@ -124,7 +124,7 @@ public class MenuPrincipal {
                 }
 
                 case 5 -> {
-                    menuconsultaProducto();
+                    menuConsultaProducto();
                 }
 
                 case 6 -> {
@@ -141,6 +141,9 @@ public class MenuPrincipal {
 
                 case 9 -> {
                     gestorBD.transacciones();
+                    
+                }
+                case 0 -> {
                     
                 }
 
@@ -355,7 +358,7 @@ public class MenuPrincipal {
         } while (opcion != 0);
     }
 
-    private void menuconsultaProducto() {
+    private void menuConsultaProducto() {
         int opcion;
         do {
             System.out.println("1. Listar todos los productos");
@@ -394,6 +397,7 @@ public class MenuPrincipal {
         do {
             System.out.println("1. Registrar una ENTRADA de stock");
             System.out.println("2. Registrar una SALIDA de stock");
+            System.out.println("0. Volver al menu MySQL");
             opcion = LectorConsola.leerOpcion("Selecciona una opcion", 0, 2);
             
             switch (opcion) {

@@ -39,7 +39,7 @@ public class InventarioJSON {
     public void importarJson(String ruta) {
         // primero valido la ruta
         if (ruta == null || ruta.trim().isEmpty()) {
-            System.out.println(ColoresConsola.ROJO + "No puedes introducir una ruta vacia" + ColoresConsola.RESET);
+            System.out.println(ColoresConsola.ROJO + "[ERROR] No puedes introducir una ruta vacia" + ColoresConsola.RESET);
             return; // salgo
         }
 
@@ -48,15 +48,15 @@ public class InventarioJSON {
         try {
             if (!archivo.exists() || !archivo.isFile()) { // debe de existir y no ser un directorio
                 System.out.println(
-                        ColoresConsola.ROJO + "La ruta introducida no existe/es un directorio" + ColoresConsola.RESET);
+                        ColoresConsola.ROJO + "[ERROR] La ruta introducida no existe/es un directorio" + ColoresConsola.RESET);
                 return;
             }
 
         } catch (SecurityException se) {
-            System.out.println(ColoresConsola.ROJO + "Error de permisos: " + se.getMessage() + ColoresConsola.RESET);
+            System.out.println(ColoresConsola.ROJO + "[ERROR] Error de permisos: " + se.getMessage() + ColoresConsola.RESET);
             return;
         } catch (Exception e) {
-            System.out.println(ColoresConsola.ROJO + "Error imprevisto: " + e.getMessage() + ColoresConsola.RESET);
+            System.out.println(ColoresConsola.ROJO + "[ERROR] Error imprevisto: " + e.getMessage() + ColoresConsola.RESET);
             return;
         }
 
@@ -68,7 +68,7 @@ public class InventarioJSON {
             // verifico que la raiz tenga "productos" y que efectivamente sea un array
             if (!root.has("productos") || !root.get("productos").isJsonArray()) {
                 System.out.println(
-                        ColoresConsola.ROJO + "La raiz debe contener el array de productos" + ColoresConsola.RESET);
+                        ColoresConsola.ROJO + "[ERROR] La raiz debe contener el array de productos" + ColoresConsola.RESET);
                 return;
             }
 
@@ -162,21 +162,21 @@ public class InventarioJSON {
 
             // si se registraron incidencias durante el proceso, las muestro
             if (!incidencias.isEmpty()) {
-                System.out.println("INCIDENCIAS:");
+                System.out.println("[AVISO] INCIDENCIAS:");
                 for (String inc : incidencias) {
                     System.out.println("  - " + inc);
                 }
-                System.out.println("Importación finalizada con incidencias");
+                System.out.println("[ERROR] Importación finalizada con incidencias");
             } else {
-                System.out.println("Importación finalizada con éxito");
+                System.out.println("[OK] Importación finalizada con éxito");
             }
         } catch (JsonSyntaxException jse) { // suelen ser errores de sintaxis del JSON
             System.out
-                    .println(ColoresConsola.ROJO + "Error: El fichero JSON está malformado. Se cancela la importación. "
+                    .println(ColoresConsola.ROJO + "[ERROR]: El fichero JSON está malformado. Se cancela la importación. "
                             + jse.getMessage() + ColoresConsola.RESET);
         } catch (Exception e) {
             System.out.println(
-                    ColoresConsola.ROJO + "ERROR al leer el fichero: " + e.getMessage() + ColoresConsola.RESET);
+                    ColoresConsola.ROJO + "[ERROR] al leer el fichero: " + e.getMessage() + ColoresConsola.RESET);
         }
     }
 
@@ -190,13 +190,13 @@ public class InventarioJSON {
         // si no hay nada no exportamos
         if (productos.isEmpty()) {
             System.out.println(
-                    ColoresConsola.ROJO + "El inventario está vacío. No hay nada que exportar." + ColoresConsola.RESET);
+                    ColoresConsola.ROJO + "[ERROR] El inventario está vacío. No hay nada que exportar." + ColoresConsola.RESET);
             return;
         }
 
         // la ruta debe ser valida
         if (ruta == null || ruta.trim().isEmpty()) {
-            System.out.println(ColoresConsola.ROJO + "ERROR: La ruta de destino no es válida." + ColoresConsola.RESET);
+            System.out.println(ColoresConsola.ROJO + "[ERROR] La ruta de destino no es válida." + ColoresConsola.RESET);
             return;
         }
 
@@ -204,15 +204,15 @@ public class InventarioJSON {
 
         // no debe ser un directorio
         if (archivo.isDirectory()) {
-            System.out.println("ERROR: La ruta corresponde a un directorio.");
+            System.out.println("[ERROR] La ruta corresponde a un directorio.");
             return;
         }
 
         // pido confirmacion antes que cualquier cosa (en el caso de que exista)
 
-        if (archivo.exists() && !LectorConsola.confirmar("Seguro que quieres sobrescribir: " + ruta.trim())) {
+        if (archivo.exists() && !LectorConsola.confirmar("[AVISO] Seguro que quieres sobrescribir: " + ruta.trim())) {
             System.out.println(
-                    ColoresConsola.VERDE + "Cancelacion recibida saliendo correctamente" + ColoresConsola.RESET);
+                    ColoresConsola.VERDE + "[OK] Cancelacion recibida saliendo correctamente" + ColoresConsola.RESET);
             return;
         }
 
@@ -234,12 +234,12 @@ public class InventarioJSON {
             // convierto la lista de productos completa a texto JSON
             gson.toJson(raiz, writer);
 
-            System.out.println(ColoresConsola.VERDE + "Catalogo exportado correctamente a JSON en: " + ruta
+            System.out.println(ColoresConsola.VERDE + "[OK] Catalogo exportado correctamente a JSON en: " + ruta
                     + ColoresConsola.RESET);
 
         } catch (Exception e) {
             System.out.println(
-                    ColoresConsola.ROJO + "ERROR al exportar a JSON: " + e.getMessage() + ColoresConsola.RESET);
+                    ColoresConsola.ROJO + "[ERROR] al exportar a JSON: " + e.getMessage() + ColoresConsola.RESET);
         }
 
     }

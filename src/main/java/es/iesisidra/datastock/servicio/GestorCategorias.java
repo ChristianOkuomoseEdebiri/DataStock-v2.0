@@ -374,7 +374,7 @@ public class GestorCategorias {
 
                     
                 } catch (SQLException sqle) {
-                    System.out.println(ColoresConsola.ROJO + "[ERROR] CLAVE CUPLICADA" + sqle.getMessage() + ColoresConsola.RESET);
+                    System.out.println(ColoresConsola.ROJO + "[ERROR] CLAVE DUPLICADA " + sqle.getMessage() + ColoresConsola.RESET);
                     con.rollback();
                    
                 }

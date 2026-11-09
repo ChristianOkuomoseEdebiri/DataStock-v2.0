@@ -48,7 +48,7 @@ public class InventarioXML {
     public void importarXml(String ruta) {
         // 1. Validar si la ruta recibida es nula o está vacía
         if (ruta == null || ruta.trim().isEmpty()) {
-            System.out.println(ColoresConsola.ROJO + "ERROR: La ruta está vacía." + ColoresConsola.RESET);
+            System.out.println(ColoresConsola.ROJO + "[ERROR] La ruta está vacía." + ColoresConsola.RESET);
             return;
         }
 
@@ -56,7 +56,7 @@ public class InventarioXML {
         Path path = Paths.get(ruta.trim());
         if (!Files.exists(path) || Files.isDirectory(path)) {
             System.out.println(
-                    ColoresConsola.ROJO + "ERROR: El fichero no existe o es un directorio." + ColoresConsola.RESET);
+                    ColoresConsola.ROJO + "[ERROR] El fichero no existe o es un directorio." + ColoresConsola.RESET);
             return;
         }
 
@@ -72,7 +72,7 @@ public class InventarioXML {
 
                 System.out.println(
                         ColoresConsola.ROJO
-                                + "ERROR: La raíz del XML debe ser <catalogo>."
+                                + "[ERROR] La raíz del XML debe ser <catalogo>."
                                 + ColoresConsola.RESET);
                 return;
             }
@@ -198,18 +198,18 @@ public class InventarioXML {
             System.out.println("Importados: " + importados + " | Rechazados: " + rechazados);
 
             if (!incidencias.isEmpty()) {
-                System.out.println("INCIDENCIAS:");
+                System.out.println("[AVISO] INCIDENCIAS:");
                 for (String inc : incidencias) {
                     System.out.println("  - " + inc);
                 }
             }
 
         } catch (org.xml.sax.SAXException e) {
-            System.out.println(ColoresConsola.ROJO + "ERROR: El fichero XML está malformado. Importación cancelada."
+            System.out.println(ColoresConsola.ROJO + "[ERROR] El fichero XML está malformado. Importación cancelada."
                     + ColoresConsola.RESET);
         } catch (Exception e) {
             System.out.println(
-                    ColoresConsola.ROJO + "ERROR al leer el fichero: " + e.getMessage() + ColoresConsola.RESET);
+                    ColoresConsola.ROJO + "[ERROR] al leer el fichero: " + e.getMessage() + ColoresConsola.RESET);
         }
     }
 
@@ -241,12 +241,12 @@ public class InventarioXML {
     public void exportarXml(String ruta) {
         if (productos.isEmpty()) {
             System.out.println(
-                    ColoresConsola.ROJO + "El inventario está vacío. No hay nada que exportar." + ColoresConsola.RESET);
+                    ColoresConsola.ROJO + "[ERROR] El inventario está vacío. No hay nada que exportar." + ColoresConsola.RESET);
             return;
         }
 
         if (ruta == null || ruta.trim().isEmpty()) {
-            System.out.println(ColoresConsola.ROJO + "ERROR: La ruta de destino no es válida." + ColoresConsola.RESET);
+            System.out.println(ColoresConsola.ROJO + "[ERROR] La ruta de destino no es válida." + ColoresConsola.RESET);
             return;
         }
 
@@ -254,15 +254,15 @@ public class InventarioXML {
 
         // no debe ser un directorio
         if (archivo.isDirectory()) {
-            System.out.println("ERROR: La ruta corresponde a un directorio.");
+            System.out.println("[ERROR] La ruta corresponde a un directorio.");
             return;
         }
 
         // pido confirmacion antes que cualquier cosa (en el caso de que exista)
 
-        if (archivo.exists() && !LectorConsola.confirmar("Seguro que quieres sobrescribir: " + ruta.trim())) {
+        if (archivo.exists() && !LectorConsola.confirmar("[AVISO] Seguro que quieres sobrescribir: " + ruta.trim())) {
             System.out.println(
-                    ColoresConsola.VERDE + "Cancelacion recibida saliendo correctamente" + ColoresConsola.RESET);
+                    ColoresConsola.VERDE + "[OK] Cancelacion recibida saliendo correctamente" + ColoresConsola.RESET);
             return;
         }
 
@@ -314,11 +314,11 @@ public class InventarioXML {
             xmlRepository.guardar(doc, pathDestino);
 
             System.out.println(
-                    ColoresConsola.VERDE + "Catálogo exportado correctamente a XML en: " + ruta +  " numero de productos exportados: " + contador +  ColoresConsola.RESET);
+                    ColoresConsola.VERDE + "[OK] Catálogo exportado correctamente a XML en: " + ruta + " numero de productos exportados: " + contador + ColoresConsola.RESET);
 
         } catch (Exception e) {
             System.out
-                    .println(ColoresConsola.ROJO + "ERROR al exportar a XML: " + e.getMessage() + ColoresConsola.RESET);
+                    .println(ColoresConsola.ROJO + "[ERROR] al exportar a XML: " + e.getMessage() + ColoresConsola.RESET);
         }
     }
 

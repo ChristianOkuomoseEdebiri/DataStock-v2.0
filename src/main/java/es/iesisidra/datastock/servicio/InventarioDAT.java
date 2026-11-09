@@ -29,17 +29,17 @@ public class InventarioDAT {
      */
     public void serializarProductos(String ruta) {
         if (ruta == null || ruta.trim().isEmpty()) {
-            System.out.println(ColoresConsola.ROJO + "La ruta no puede estar vacia" + ColoresConsola.RESET);
+            System.out.println(ColoresConsola.ROJO + "[ERROR] La ruta no puede estar vacia" + ColoresConsola.RESET);
             return; // no sigo
         }
 
         if (productos.isEmpty()) {
-            System.out.println(ColoresConsola.ROJO + "No hay productos" + ColoresConsola.RESET);
+            System.out.println(ColoresConsola.ROJO + "[ERROR] No hay productos" + ColoresConsola.RESET);
             return;
         }
 
         // si es false no sigo
-        if (!LectorConsola.confirmar("Todo preparado para la serializacion confirmacion: S/N")) {
+        if (!LectorConsola.confirmar("[AVISO] Todo preparado para la serializacion confirmacion: S/N")) {
             System.out.println(ColoresConsola.VERDE + "NEGACION RECIBIDA SALIENDO..." + ColoresConsola.RESET);
             return;
         }
@@ -49,7 +49,7 @@ public class InventarioDAT {
             System.out.println(ColoresConsola.VERDE + productos.size() + " productos serializados correctamente"
                     + ColoresConsola.RESET);
         } catch (Exception e) {
-            System.out.println(ColoresConsola.ROJO + "ERROR a la hora de serializar los productos: " + e.getMessage()
+            System.out.println(ColoresConsola.ROJO + "[ERROR] a la hora de serializar los productos: " + e.getMessage()
                     + ColoresConsola.RESET);
 
         }
@@ -119,11 +119,11 @@ public class InventarioDAT {
 
             productos.clear();
             productos.addAll(listaAuxiliar);
-            System.out.println(ColoresConsola.VERDE + productos.size() + " productos obtenidos correctamente"
+            System.out.println(ColoresConsola.VERDE + productos.size() + " [OK] productos obtenidos correctamente"
                     + ColoresConsola.RESET);
 
         } catch (Exception e) {
-            System.out.println(ColoresConsola.ROJO + "ERROR: " + e.getMessage()
+            System.out.println(ColoresConsola.ROJO + "[ERROR]: " + e.getMessage()
                     + ColoresConsola.RESET);
         }
 
