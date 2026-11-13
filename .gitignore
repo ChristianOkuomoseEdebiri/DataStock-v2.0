@@ -4,7 +4,7 @@ target/
 *.iml
 .vscode/
 .DS_Store
-/src/main/resources/db.properties
+/src/main/java/resources/db.properties
 # Salidas generadas por el alumnado (no se ignoran los ejemplos de entrada)
 datos/salidas/*
 !datos/salidas/.gitkeep
